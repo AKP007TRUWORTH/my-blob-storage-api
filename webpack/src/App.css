@@ -32,7 +32,18 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
+  }
+}
+
+.dashboardSection {
+  min-height: 100vh;
+  background-color: red;
+
+  .ant-layout.ant-layout-has-sider,
+  .ant-layout-sider {
+    min-height: 100vh;
   }
 }
