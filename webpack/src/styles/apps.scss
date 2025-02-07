@@ -1,0 +1,53 @@
+// Global Styles
+$primary-bg: #FFFFFF;
+$secondary-bg: #2d2d2d;
+$border-color: #3a3a3a;
+$text-color: #000000;
+$input-bg: #252525;
+$button-bg: #1890ff;
+$avatar-bg: #ffccc7;
+$warning-bg: rgba(255, 193, 7, 0.2);
+$warning-border: rgba(255, 193, 7, 0.5);
+
+.apps-container {
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .search-input {
+      width: 40%;
+      background: white;
+      border: 1px solid $border-color;
+      color: black;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+    }
+  }
+
+  .apps-table {
+    border-radius: 8px;
+
+    .ant-table {
+      background: #FFFFFF;
+    }
+
+    .ant-table-tbody>tr>td {
+      color: $text-color;
+    }
+
+    .ant-avatar {
+      background: $avatar-bg;
+      color: #000;
+    }
+
+    .apps-table-row {
+      cursor: pointer;
+    }
+  }
+}

@@ -15,20 +15,20 @@ const Sidebar = () => {
 
   const menuItems = [
     {
-      title: "Distribute",
+      title: "CodePush",
       icon: <AppstoreOutlined />,
-      subMenu: [
-        {
-          key: "1",
-          title: "CodePush",
-          path: '/apps/code-push'
-        },
-      ]
+      // path: '/apps/code-push'
+      // subMenu: [
+      //   {
+      //     key: "1",
+      //     title: "CodePush",
+
+      //   },
+      // ]
     }
   ];
 
   return (
-
     <Sider
       collapsedWidth="0"
       breakpoint="xl"

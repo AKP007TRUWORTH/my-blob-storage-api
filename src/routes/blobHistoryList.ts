@@ -1,14 +1,14 @@
 // Route to fetch JSON from Azure Blob Storage
 import express from 'express';
-import { streamToString } from '../helper/streamToString.js';
-import { blobServiceClient } from '../config/azureBlobConfig.js';
+import { streamToString } from '../helper/streamToString';
+import { blobServiceClient } from '../config/azureBlobConfig';
 
 const router = express.Router();
 
 router.get("/get-json", async (req, res) => {
     const { blobName, containerName } = req.query;
 
-    const containerClient = blobServiceClient.getContainerClient(containerName ?? "packagehistoryv1");
+    const containerClient = blobServiceClient.getContainerClient("packagehistoryv1");
 
     try {
         const jsonData = await getBlobContent(blobName ?? "41bfsC_DB-e", containerClient);
@@ -24,11 +24,11 @@ router.get("/get-json", async (req, res) => {
     }
 });
 
-async function getBlobContent(blobName, containerClient) {
+async function getBlobContent(blobName: any, containerClient: any) {
     try {
         const blobClient = containerClient.getBlobClient(blobName);
         const downloadBlockBlobResponse = await blobClient.download();
-        const downloadedContent = await streamToString(downloadBlockBlobResponse.readableStreamBody);
+        const downloadedContent: any = await streamToString(downloadBlockBlobResponse.readableStreamBody);
         return JSON.parse(downloadedContent);
     } catch (error) {
         console.error("Error fetching blob:", error.message);

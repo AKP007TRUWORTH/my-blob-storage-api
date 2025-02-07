@@ -1,5 +1,5 @@
 import express from 'express';
-import { blobServiceClient } from '../config/azureBlobConfig.js';
+import { blobServiceClient } from '../config/azureBlobConfig';
 
 const router = express.Router();
 

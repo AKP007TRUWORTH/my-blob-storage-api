@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
+    "build": "tsc",
     "dev": "nodemon",
     "test": "mocha test"
   },
@@ -12,14 +12,35 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@azure/data-tables": "^13.3.0",
     "@azure/identity": "^4.6.0",
+    "@azure/keyvault-secrets": "^4.9.0",
     "@azure/storage-blob": "^12.26.0",
+    "body-parser": "^1.20.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-domain-middleware": "^0.1.0",
+    "morgan": "^1.10.0",
+    "node-deepcopy": "0.1.1",
+    "q": "^1.5.1",
+    "sanitize-html": "^2.14.0",
+    "shortid": "^2.2.17",
+    "stream-to-array": "^2.3.0",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
     "uuid": "^11.0.5"
   },
   "devDependencies": {
-    "morgan": "^1.10.0",
-    "nodemon": "^3.1.9"
+    "@types/express": "^5.0.0",
+    "@types/express-domain-middleware": "^0.0.9",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.11.30",
+    "@types/q": "^1.5.8",
+    "@types/shortid": "^2.2.0",
+    "@types/stream-to-array": "^2.3.3",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1",
+    "tsx": "^4.19.2",
+    "typescript": "^4.9.5"
   }
 }

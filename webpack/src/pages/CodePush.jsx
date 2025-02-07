@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { Table, Tag, Avatar, Alert, Typography, Layout } from "antd";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import { Table, Tag, Avatar, Alert, Typography, Layout, Button, Select, Dropdown, Tooltip, Space, Menu } from "antd";
+import { CheckCircleOutlined, DownOutlined, UserOutlined } from "@ant-design/icons";
 import AppLayout from "../components/AppLayout";
 
 const { Title } = Typography;
@@ -162,15 +162,95 @@ const data = [
 
 const { Content } = Layout;
 
+const items = [
+    {
+        label: 'Production',
+        key: '1',
+    },
+    {
+        label: 'Development',
+        key: '2',
+    }
+];
+
 const CodePush = () => {
+    const [environment, setEnvironment] = React.useState('');
+
+    const [selected, setSelected] = React.useState("Production");
+
     const [pagination, setPagination] = React.useState({
         current: 1,
         pageSize: 5,
     });
 
+    // const menuProps = {
+    //     items,
+    //     // onClick: handleMenuClick,
+    // };
+
+    const handleMenuClick = (e) => {
+        setSelected(e.key); // Update the selected value
+    };
+
+
+    const menu = (
+        <Menu onClick={handleMenuClick}>
+            <Menu.Item key="Production">Production</Menu.Item>
+            <Menu.Item key="Development">Development</Menu.Item>
+        </Menu>
+    );
+
 
     return (
         <AppLayout>
+
+            <div className="flex justify-between">
+
+                <Dropdown overlay={menu} trigger={["click"]}>
+                    <Button style={{
+                        float: "right",
+                        marginRight: 18,
+                        marginTop: 24
+                    }}>
+                        {selected} <DownOutlined />
+                    </Button>
+                </Dropdown>
+            </div>
+
+            {/* <Dropdown
+                    menu={menuProps}
+
+                >
+                    <Button
+                        style={{
+                            float: "right",
+                            marginRight: 18,
+                            marginTop: 24
+                        }}
+                    >
+                        <Space>
+                            Button
+                            <DownOutlined />
+                        </Space>
+                    </Button>
+                </Dropdown> */}
+            {/* <Select
+                    defaultValue="lucy"
+                    style={{
+                        width: 120, float: "right",
+                        marginRight: 18,
+                        marginTop: 24
+                    }}
+                    // onChange={()}
+                    options={[
+                        { value: 'jack', label: 'Jack' },
+                        { value: 'lucy', label: 'Lucy' },
+                        { value: 'Yiminghe', label: 'yiminghe' },
+                        { value: 'disabled', label: 'Disabled', disabled: true },
+                    ]}
+                /> */}
+
+
             <Content
                 style={{
                     margin: "24px 16px",
@@ -179,8 +259,9 @@ const CodePush = () => {
                 }}
             >
                 <Title level={2}>CodePush</Title>
-                
+
                 <Table
+                    bordered
                     columns={columns}
                     dataSource={data}
                     pagination={pagination}
