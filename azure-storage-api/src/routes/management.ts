@@ -24,7 +24,8 @@ export function getManagementRouter(config: ManagementConfig): Router {
   const nameResolver: NameResolver = new NameResolver(config.storage);
 
   router.get("/account", (req: Request, res: Response, next: (err?: any) => void): any => {
-    const accountId: string = "EkyfH5FO-l";
+    const accountId: string = req.user.id;
+    
     storage
       .getAccount(accountId)
       .then((storageAccount: storageTypes.Account) => {

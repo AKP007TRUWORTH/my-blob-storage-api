@@ -1,0 +1,135 @@
+// Global Styles
+$primary-bg: #0d1b40;
+$secondary-bg: #ffffff;
+$btn-bg: #f4f4f4;
+$btn-hover: #e0e0e0;
+$border-color: #ddd;
+
+.auth-container {
+    display: flex;
+    height: 100vh;
+    background: $primary-bg;
+    color: white;
+
+    .auth-left {
+        flex: 1;
+        background: url("https://cdn.dribbble.com/users/107769/screenshots/7059300/media/ca35803801c39a8b481c687a4de91b09.png") no-repeat center;
+        background-size: contain;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+
+        .auth-text {
+            max-width: 400px;
+            text-align: center;
+
+            .auth-title {
+                color: white;
+                font-weight: bold;
+            }
+
+            .auth-subtitle {
+                color: #a0a0a0;
+                font-size: 16px;
+            }
+        }
+    }
+
+    .auth-right {
+        width: 400px;
+        background: $secondary-bg;
+        color: black;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-radius: 8px;
+        margin: auto;
+
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .auth-alert {
+            margin-bottom: 20px;
+        }
+
+        .auth-signin {
+            margin-bottom: 10px;
+        }
+
+        .auth-btn {
+            background: $btn-bg;
+            border: 1px solid $border-color;
+            font-size: 16px;
+            height: 40px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+
+            &:hover {
+                background: $btn-hover;
+            }
+        }
+
+        .auth-btn-group {
+            display: flex;
+            gap: 10px;
+
+            .auth-btn {
+                flex: 1;
+            }
+        }
+
+        .auth-icon {
+            height: 20px;
+        }
+
+        .auth-remember {
+            margin-top: 15px;
+        }
+
+        .auth-alt,
+        .auth-new {
+            margin-top: 15px;
+            font-size: 14px;
+
+            a {
+                color: #0078d4;
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        .auth-footer {
+            margin-top: 20px;
+            font-size: 12px;
+            text-align: center;
+
+            a {
+                color: gray;
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        .auth-copyright {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 10px;
+            color: gray;
+        }
+    }
+}

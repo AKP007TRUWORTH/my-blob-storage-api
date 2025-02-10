@@ -1,276 +1,156 @@
-import React, { useEffect } from "react";
-import { Table, Tag, Avatar, Alert, Typography, Layout, Button, Select, Dropdown, Tooltip, Space, Menu } from "antd";
-import { CheckCircleOutlined, DownOutlined, UserOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import { Table, Tag, Avatar, Typography, Layout, Button, Dropdown, Spin, message, Menu } from "antd";
+import { CheckCircleOutlined, DownOutlined } from "@ant-design/icons";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+
 import AppLayout from "../components/AppLayout";
 
 const { Title } = Typography;
-
-const columns = [
-    {
-        title: "Release",
-        dataIndex: "release",
-        key: "release",
-        render: (text, record) => (
-            <div className="flex items-center gap-2">
-                <Avatar size="small">{text.charAt(1)}</Avatar>
-                <div>
-                    <div className="font-semibold">{text}</div>
-                    <div className="text-gray-500 text-sm">{record.user}</div>
-                </div>
-            </div>
-        ),
-    },
-    {
-        title: "Target Versions",
-        dataIndex: "targetVersion",
-        key: "targetVersion",
-    },
-    {
-        title: "Status",
-        dataIndex: "status",
-        key: "status",
-        render: (status) => (
-            <Tag icon={<CheckCircleOutlined />} color="success">
-                {status}
-            </Tag>
-        ),
-    },
-    {
-        title: "Mandatory",
-        dataIndex: "mandatory",
-        key: "mandatory",
-    },
-    {
-        title: "Rollbacks",
-        dataIndex: "rollbacks",
-        key: "rollbacks",
-    },
-    {
-        title: "Active Devices",
-        dataIndex: "activeDevices",
-        key: "activeDevices",
-    },
-    {
-        title: "Date",
-        dataIndex: "date",
-        key: "date",
-    },
-];
-
-// Dummy Data
-const data = [
-    {
-        key: "1",
-        release: "v288",
-        user: "rohit.mundra@truworthwellness.com",
-        targetVersion: "6.5",
-        status: "Enabled",
-        mandatory: "Yes",
-        rollbacks: 828,
-        activeDevices: 32251,
-        date: "Jan 26, 12:30 PM",
-    },
-    {
-        key: "2",
-        release: "v287",
-        user: "rohit.mundra@truworthwellness.com",
-        targetVersion: "6.5",
-        status: "Enabled",
-        mandatory: "No",
-        rollbacks: 1468,
-        activeDevices: 12257,
-        date: "Jan 20, 10:43 PM",
-    },
-    {
-        key: "3",
-        release: "v286",
-        user: "rohit.mundra@truworthwellness.com",
-        targetVersion: "6.5",
-        status: "Enabled",
-        mandatory: "Yes",
-        rollbacks: 807,
-        activeDevices: 16271,
-        date: "Jan 13, 5:09 PM",
-    },
-    {
-        key: "4",
-        release: "v285",
-        user: "rohit.mundra@truworthwellness.com",
-        targetVersion: "6.5",
-        status: "Enabled",
-        mandatory: "No",
-        rollbacks: 2275,
-        activeDevices: 9272,
-        date: "Jan 6, 4:15 PM",
-    },
-    {
-        key: "5",
-        release: "v284",
-        user: "rohit.mundra@truworthwellness.com",
-        targetVersion: "6.5",
-        status: "Enabled",
-        mandatory: "Yes",
-        rollbacks: 1378,
-        activeDevices: 42259,
-        date: "Dec 16, 10:54 AM",
-    },
-    {
-        key: "6",
-        release: "v283",
-        user: "rohit.mundra@truworthwellness.com",
-        targetVersion: "6.5",
-        status: "Enabled",
-        mandatory: "Yes",
-        rollbacks: 463,
-        activeDevices: 5224,
-        date: "Dec 10, 8:29 PM",
-    },
-    {
-        key: "7",
-        release: "v282",
-        user: "rohit.mundra@truworthwellness.com",
-        targetVersion: "6.5",
-        status: "Enabled",
-        mandatory: "No",
-        rollbacks: 1310,
-        activeDevices: 2617,
-        date: "Dec 5, 3:17 PM",
-    },
-    {
-        key: "8",
-        release: "v281",
-        user: "rohit.mundra@truworthwellness.com",
-        targetVersion: "6.5",
-        status: "Enabled",
-        mandatory: "Yes",
-        rollbacks: 667,
-        activeDevices: 8195,
-        date: "Nov 26, 10:04 AM",
-    },
-    {
-        key: "9",
-        release: "v280",
-        user: "rohit.mundra@truworthwellness.com",
-        targetVersion: "6.5",
-        status: "Enabled",
-        mandatory: "Yes",
-        rollbacks: 1073,
-        activeDevices: 10390,
-        date: "Nov 8, 1:20 PM",
-    },
-];
-
 const { Content } = Layout;
 
-const items = [
-    {
-        label: 'Production',
-        key: '1',
-    },
-    {
-        label: 'Development',
-        key: '2',
-    }
-];
-
 const CodePush = () => {
-    const [environment, setEnvironment] = React.useState('');
+    const { appName, deployment } = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    const [selected, setSelected] = React.useState("Production");
+    const [loading, setLoading] = useState(true);
+    const [historyData, setHistoryData] = useState([]);
+    const [selectedDeployment, setSelectedDeployment] = useState(deployment || "Production");
 
-    const [pagination, setPagination] = React.useState({
-        current: 1,
-        pageSize: 5,
-    });
+    const deploymentTypes = location.state?.releaseType || deployment;
 
-    // const menuProps = {
-    //     items,
-    //     // onClick: handleMenuClick,
-    // };
+    useEffect(() => {
+        fetchHistory();
+    }, [appName, selectedDeployment]);
 
-    const handleMenuClick = (e) => {
-        setSelected(e.key); // Update the selected value
+    const fetchHistory = async () => {
+        setLoading(true);
+        try {
+            const storedAccessKey = localStorage.getItem("accessKey"); // Retrieve from LocalStorage
+
+            if (!storedAccessKey) {
+                console.error("⚠️ No Access Key Found in LocalStorage");
+                return;
+            }
+
+            const response = await axios.get(`/api/apps/${appName}/deployments/${selectedDeployment}/history`, {
+                headers: {
+                    "Authorization": `bearer ${storedAccessKey} `
+                }
+            });
+            
+            setHistoryData(response.data.history.reverse());
+        } catch (error) {
+            message.error("Failed to fetch deployment history.");
+        }
+        setLoading(false);
     };
 
+    const handleDeploymentChange = (selected) => {
+        setSelectedDeployment(selected);
+        navigate(`/apps/${appName}/deployments/${selected}/history`, {
+            state: {
+                releaseType: deploymentTypes
+            },
+            replace: true
+        });
+    };
 
-    const menu = (
-        <Menu onClick={handleMenuClick}>
-            <Menu.Item key="Production">Production</Menu.Item>
-            <Menu.Item key="Development">Development</Menu.Item>
+    const deploymentMenu = (
+        <Menu onClick={(e) => handleDeploymentChange(e.key)}>
+            {deploymentTypes?.map((deployment) => (
+                <Menu.Item key={deployment}>{deployment}</Menu.Item>
+            ))}
         </Menu>
     );
 
-
     return (
         <AppLayout>
-
             <div className="flex justify-between">
-
-                <Dropdown overlay={menu} trigger={["click"]}>
-                    <Button style={{
-                        float: "right",
-                        marginRight: 18,
-                        marginTop: 24
-                    }}>
-                        {selected} <DownOutlined />
+                <Dropdown overlay={deploymentMenu} trigger={["click"]}>
+                    <Button style={{ float: "right", marginRight: 18, marginTop: 24 }}>
+                        {selectedDeployment} <DownOutlined />
                     </Button>
                 </Dropdown>
             </div>
 
-            {/* <Dropdown
-                    menu={menuProps}
-
+            <Content style={{ margin: "24px 16px", padding: 24, background: "#fff" }}>
+                <Title level={2}>
+                    CodePush Deployment History
+                </Title>
+                <Title level={5}
+                    style={{ marginBottom: 24, marginLeft: 4 }}
                 >
-                    <Button
-                        style={{
-                            float: "right",
-                            marginRight: 18,
-                            marginTop: 24
-                        }}
-                    >
-                        <Space>
-                            Button
-                            <DownOutlined />
-                        </Space>
-                    </Button>
-                </Dropdown> */}
-            {/* <Select
-                    defaultValue="lucy"
-                    style={{
-                        width: 120, float: "right",
-                        marginRight: 18,
-                        marginTop: 24
-                    }}
-                    // onChange={()}
-                    options={[
-                        { value: 'jack', label: 'Jack' },
-                        { value: 'lucy', label: 'Lucy' },
-                        { value: 'Yiminghe', label: 'yiminghe' },
-                        { value: 'disabled', label: 'Disabled', disabled: true },
-                    ]}
-                /> */}
-
-
-            <Content
-                style={{
-                    margin: "24px 16px",
-                    padding: 24,
-                    background: "#fff",
-                }}
-            >
-                <Title level={2}>CodePush</Title>
+                    App: {appName} | Deployment: {selectedDeployment}
+                </Title>
 
                 <Table
                     bordered
                     columns={columns}
-                    dataSource={data}
-                    pagination={pagination}
+                    dataSource={historyData.map((item, index) => ({ key: index, ...item }))}
+                    pagination={{ pageSize: 5 }}
                     rowClassName="hover:bg-gray-100"
-                    onChange={(pagination) => setPagination(pagination)}
+                    loading={loading}
                 />
+
             </Content>
         </AppLayout>
     );
 };
 
 export default CodePush;
+
+const columns = [
+    {
+        title: "Release Label",
+        dataIndex: "label",
+        key: "label",
+        render: (text) => (
+            <div className="flex items-center gap-2">
+                <Avatar size="small">
+                    {text.charAt(1)}
+                </Avatar>
+                <span style={{ marginLeft: 8 }}>
+                    {text}
+                </span>
+            </div>
+        ),
+    },
+    {
+        title: "App Version",
+        dataIndex: "appVersion",
+        key: "appVersion",
+    },
+    {
+        title: "Status",
+        dataIndex: "isMandatory",
+        key: "isMandatory",
+        render: (isMandatory) => (
+            <Tag icon={<CheckCircleOutlined />} color={isMandatory ? "success" : "default"}>
+                {isMandatory ? "Mandatory" : "Optional"}
+            </Tag>
+        ),
+    },
+    {
+        title: "Rollout",
+        dataIndex: "rollout",
+        key: "rollout",
+        render: (rollout) => (rollout ? `${rollout}%` : "N/A"),
+    },
+    {
+        title: "Release Method",
+        dataIndex: "releaseMethod",
+        key: "releaseMethod",
+    },
+    {
+        title: "Size (Bytes)",
+        dataIndex: "size",
+        key: "size",
+    },
+    {
+        title: "Released By",
+        dataIndex: "releasedBy",
+        key: "releasedBy",
+    }
+];

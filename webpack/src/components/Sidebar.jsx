@@ -1,30 +1,18 @@
 import React from "react";
 import { Layout, Menu } from "antd";
-import { Link, useLocation } from "react-router-dom";
-import {
-  HomeOutlined,
-  AppstoreOutlined,
-  BuildOutlined,
-  DatabaseOutlined,
-} from "@ant-design/icons";
+import { Link } from "react-router-dom";
+import { AppstoreOutlined } from "@ant-design/icons";
 
 const { Sider } = Layout;
 
 const Sidebar = () => {
-  const location = useLocation();
-
+  
   const menuItems = [
     {
       title: "CodePush",
       icon: <AppstoreOutlined />,
-      // path: '/apps/code-push'
-      // subMenu: [
-      //   {
-      //     key: "1",
-      //     title: "CodePush",
-
-      //   },
-      // ]
+      path: '/apps',
+      replace: true
     }
   ];
 
