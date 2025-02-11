@@ -1,6 +1,7 @@
 import React from "react";
 import { Layout, Breadcrumb, Avatar, Space } from "antd";
 import { Link, useLocation } from "react-router-dom";
+import { UserOutlined } from "@ant-design/icons";
 
 const { Header } = Layout;
 
@@ -29,16 +30,16 @@ const HeaderComponent = () => {
                 App Center
             </div>
 
-            {/* Left: Breadcrumbs */}
-            <div>
+            {/* <div>
                 <Breadcrumb separator=" / " style={{ color: "white" }}>
                     {breadcrumbItems}
                 </Breadcrumb>
-            </div>
+            </div> */}
 
-            {/* Right: User Info */}
             <Space>
-                <Avatar style={{ backgroundColor: "#ffccc7", color: "#000" }}>A</Avatar>
+                <Avatar size="medium" style={{ backgroundColor: "#ffccc7", color: "#000" }}>
+                    <UserOutlined />
+                </Avatar>
             </Space>
         </Header>
     );

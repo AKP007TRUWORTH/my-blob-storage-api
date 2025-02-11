@@ -1,5 +1,6 @@
 import { Affix, Layout } from "antd";
 import Sidebar from "./Sidebar";
+import HeaderComponent from "./Header";
 
 const AppLayout = ({ children }) => {
 
@@ -10,6 +11,7 @@ const AppLayout = ({ children }) => {
                     <Sidebar />
                 </Affix>
                 <Layout style={{ background: '#00000' }}>
+                    <HeaderComponent />
                     {children}
                 </Layout>
             </Layout>
