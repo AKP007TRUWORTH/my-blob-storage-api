@@ -1,23 +1,32 @@
 import React, { useEffect } from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
+import useRequest from "../hooks/useRequest";
 
 const PrivateRoute = () => {
-    const location = useLocation();
+    const isAuthenticated = localStorage.getItem("accessKey");
 
-    const queryParams = new URLSearchParams(location.search);
-    const accessKey = queryParams.get("accessKey");
-    const storedAccessKey = localStorage.getItem("accessKey");
+    const { makeRequest } = useRequest();
 
     useEffect(() => {
-        if (accessKey) {
-            console.log(accessKey)
-            localStorage.setItem("accessKey", accessKey);
-        }
+        checkSession();
     }, []);
 
-    return accessKey || storedAccessKey
-        ? <Outlet />
-        : <Navigate to="/" replace />;
+    const checkSession = async () => {
+        makeRequest({
+            method: "GET",
+            url: "/api/auth/session",
+            onSuccess: (response) => {
+                if (response.authenticated) {
+                    localStorage.setItem("accessKey", response.user.accessKey);
+                    localStorage.setItem("userId", response.user.id);
+                } else {
+                    return <Navigate to="/" replace />
+                }
+            }
+        })
+    };
+
+    return isAuthenticated ? <Outlet /> : <Navigate to="/" replace />;
 };
 
 export default PrivateRoute;

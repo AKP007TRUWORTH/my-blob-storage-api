@@ -36,7 +36,7 @@ export default () => {
       }
 
       if (err.response) {
-        if (err.response.status == 401 && err.response.data.errors[0].name == "TokenExpiredError") {
+        if (err.response.status == 401) {
           localStorage.clear()
           return navigate({ pathname: "/", state: { from: location } })
         }

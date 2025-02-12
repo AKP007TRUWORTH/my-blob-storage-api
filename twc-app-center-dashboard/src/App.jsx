@@ -15,13 +15,7 @@ const App = () => {
 
   return (
     <Router>
-      <ToastContainer
-        // position="top-right"
-        // autoClose={3000}
-        // hideProgressBar={false}
-        // progressStyle={{ background: "black" }}
-        // style={{ color: "#fff" }}
-      />
+      <ToastContainer />
       <Routes>
         <Route path="" element={<LoginComponent />} />
         <Route path="/create-account" element={<RegisterComponent />} />

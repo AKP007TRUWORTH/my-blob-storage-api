@@ -3,13 +3,13 @@ import { Button, Layout, Menu } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { AppstoreOutlined, LogoutOutlined } from "@ant-design/icons";
 import { showToast, toastSeverity } from "../utils/toastify";
-import axios from "axios";
+import useRequest from "../hooks/useRequest";
 
 const { Sider } = Layout;
 
 const Sidebar = () => {
-
   const Navigate = useNavigate();
+  const { makeRequest } = useRequest();
 
   const menuItems = [
     {
@@ -21,27 +21,18 @@ const Sidebar = () => {
   ];
 
   const deleteAccessKeyFromStorage = async () => {
-    localStorage.clear();
-    Navigate("/");
-    // try {
-    //   const storedAccessKey = localStorage.getItem("accessKey"); // Retrieve from LocalStorage
-
-    //   if (!storedAccessKey) {
-    //     console.error("⚠️ No Access Key Found in LocalStorage");
-    //     return;
-    //   }
-
-    //   await axios.delete(`http://localhost:3000/accessKeys/${storedAccessKey}`, {
-    //     headers: {
-    //       "Authorization": `bearer ${storedAccessKey} `
-    //     }
-    //   });
-
-    //   localStorage.clear();
-    //   Navigate("/");
-    // } catch (error) {
-    //   showToast(error.response.data, toastSeverity.ERROR);
-    // }
+    makeRequest({
+      method: "GET",
+      url: "/api/auth/logout",
+      onSuccess: (response) => {
+        showToast(response.message, toastSeverity.SUCCESS);
+        localStorage.clear();
+        Navigate("/");
+      },
+      onError: (error) => {
+        showToast(error.response.data, toastSeverity.ERROR);
+      }
+    })
   }
 
   return (

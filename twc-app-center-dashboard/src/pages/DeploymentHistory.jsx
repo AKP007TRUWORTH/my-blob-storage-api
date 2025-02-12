@@ -113,13 +113,18 @@ const columns = [
         title: "Release",
         dataIndex: "label",
         key: "label",
-        render: (text) => (
-            <div className="flex items-center gap-2">
-                <Avatar size="medium">
-                    <UserOutlined />
-                </Avatar>
-                <span style={{ marginLeft: 8 }}>
-                    {text}
+        render: (text, record) => (
+            <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                    <Avatar size="medium">
+                        <UserOutlined />
+                    </Avatar>
+                    <span style={{ fontWeight: "bold", marginLeft: 8, display: "block" }}>
+                        {text}
+                    </span>
+                </div>
+                <span style={{ fontSize: "12px", color: "gray", marginTop: 8 }}>
+                    {record.releasedBy}
                 </span>
             </div>
         ),
@@ -141,8 +146,8 @@ const columns = [
         dataIndex: "status",
         key: "status",
         render: (isDisabled) => (
-            <div className="flex items-center gap-2">
-                <CheckCircleOutlined />
+            <div>
+                <CheckCircleOutlined style={{ marginRight: 8 }} />
                 {isDisabled ? "Disabled" : "Enabled"}
             </div>
         ),
@@ -158,21 +163,16 @@ const columns = [
         ),
     },
     {
-        title: "Rollback",
+        title: "Rollout",
         dataIndex: "rollout",
         key: "rollout",
-        render: (rollout) => (rollout ? `${rollout}` : "N/A"),
+        render: (rollout) => (rollout ? `${rollout}%` : "N/A"),
     },
     {
         title: "Size",
         dataIndex: "size",
         key: "size",
         render: (size) => formatFileSize(size),
-    },
-    {
-        title: "Released By",
-        dataIndex: "releasedBy",
-        key: "releasedBy",
     },
     {
         title: "Date",

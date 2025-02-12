@@ -6,6 +6,7 @@ import axios from "axios";
 import { showToast, toastSeverity } from "../utils/toastify";
 
 import AppLayout from "../components/AppLayout";
+import useRequest from "../hooks/useRequest";
 
 const { Option } = Select;
 const { Content } = Layout;
@@ -32,7 +33,8 @@ const AppsList = () => {
     const [form] = Form.useForm();
 
     const navigate = useNavigate();
-    const location = useLocation();
+
+    const { makeRequest } = useRequest();
 
     useEffect(() => {
         // Disable back navigation
@@ -59,61 +61,44 @@ const AppsList = () => {
     }, [searchText, selectedOS, selectedReleaseType, selectedRole, appsData]);
 
     const getAccount = async () => {
-        try {
-            const queryParams = new URLSearchParams(location.search);
-            const accessKey = queryParams.get("accessKey");
-
-            const response = await axios.get("http://localhost:3000/account", {
-                headers: {
-                    "Authorization": `bearer ${accessKey} `
-                }
-            });
-
-            setAccount(response.data.account);
-        } catch (error) {
-            console.error("Error fetching account:", error);
-        }
+        makeRequest({
+            method: "GET",
+            url: "/api/account",
+            onSuccess: (response) => {
+                setAccount(response.account);
+            },
+            onError: (error) => {
+                showToast(error.response.data, toastSeverity.ERROR);
+            }
+        })
     };
 
     const fetchApps = async () => {
         setLoading(true);
-        try {
-            const queryParams = new URLSearchParams(location.search);
-            const accessKey = queryParams.get("accessKey");
+        makeRequest({
+            method: "GET",
+            url: "/api/apps",
+            onSuccess: (response) => {
 
-            const response = await axios.get("http://localhost:3000/apps", {
-                headers: {
-                    "Authorization": `bearer ${accessKey} `
-                }
-            });
+                const formattedData = response.apps.map((app, index) => ({
+                    key: index + 1,
+                    name: app.name,
+                    os: app.name.includes("iOS") ? "iOS" : "Android",
+                    releaseType: app.deployments,
+                    role: app.collaborators["anil.prajapat@truworthwellness.com"]?.permission || "Collaborator",
+                    collaborators: app.collaborators,
+                    avatar: app.name.charAt(0),
+                    deployment: app.deployments,
+                }));
 
-            const formattedData = response.data.apps.map((app, index) => ({
-                key: index + 1,
-                name: app.name,
-                os: app.name.includes("iOS") ? "iOS" : "Android",
-                releaseType: app.deployments,
-                role: app.collaborators["anil.prajapat@truworthwellness.com"]?.permission || "Collaborator",
-                collaborators: app.collaborators,
-                avatar: app.name.charAt(0),
-                deployment: app.deployments,
-            }));
+                setAppsData(formattedData);
+                setFilteredData(formattedData);
 
-            // let foundOwner = false;
-
-            // for (let app of response) {
-            //     const collaborators = Object.values(app.collaborators);
-            //     if (collaborators.some(collaborator => collaborator.permission === "Owner")) {
-            //         foundOwner = true;
-            //         break;
-            //     }
-            // }
-
-            // setIsOwner(foundOwner);
-            setAppsData(formattedData);
-            setFilteredData(formattedData);
-        } catch (error) {
-            console.error("Error fetching apps:", error);
-        }
+            },
+            onError: (error) => {
+                showToast(error.response.data, toastSeverity.ERROR);
+            }
+        })
         setLoading(false);
     };
 
@@ -144,7 +129,7 @@ const AppsList = () => {
             <Card
                 bordered={false}
                 style={{
-                    background: "#F9FAFB",
+                    background: "#FFFFFF",
                     margin: "16px",
                     borderRadius: "8px",
                     shadow: "4px 4px 4px 4px rgba(0, 0, 0, 0.1)",
@@ -156,41 +141,20 @@ const AppsList = () => {
                             {account.name && (
                                 <Title level={5} style={{ margin: 0 }}>
                                     <UserOutlined style={{ marginRight: 8, color: "#1890ff" }} />
-                                    Account Holder Name : <Text type="secondary" strong>{account.name}</Text>
+                                    Name : <Text type="secondary" strong>{account.name}</Text>
                                 </Title>
                             )}
 
                             {account.email && (
                                 <Title level={5} style={{ margin: 0 }}>
                                     <MailOutlined style={{ marginRight: 8, color: "#1890ff" }} />
-                                    Account Email : <Text type="secondary" strong>{account.email}</Text>
+                                    Email : <Text type="secondary" strong>{account.email}</Text>
                                 </Title>
                             )}
                         </div>
                     </div>
                 </Space>
             </Card>
-            {/* <div style={{ display: "flex", alignItems: "center", margin: 18 }}>
-                <div>
-                    {account.name &&
-                        <Title level={4}>
-                            Account Name : {account.name}
-                        </Title>
-                    }
-
-                    {account.email &&
-                        <Title level={4}>
-                            Account Email : {account.email}
-                        </Title>
-                    }
-                </div>
-
-                {isOwner &&
-                    <Button type="primary" style={{ marginLeft: "auto" }} onClick={() => setIsModalVisible(true)}>
-                        Add Collaborator
-                    </Button>
-                }
-            </div> */}
 
             <Content style={{
                 background: "#FFFFFF",
@@ -203,16 +167,14 @@ const AppsList = () => {
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
                         <h2>My App List</h2>
 
-                        {isOwner && (
-                            <Button
-                                type="primary"
-                                icon={<PlusOutlined />}
-                                onClick={() => setIsModalVisible(true)}
-                                size="medium"
-                            >
-                                Add Collaborator
-                            </Button>
-                        )}
+                        <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsModalVisible(true)}
+                            size="medium"
+                        >
+                            Add Collaborator
+                        </Button>
                     </div>
 
                     {/* Filters Section */}
@@ -281,6 +243,8 @@ const CollaboratorModal = ({ isModalVisible, setIsModalVisible, form, appsData }
     const [selectedApp, setSelectedApp] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    const { makeRequest } = useRequest();
+
     const handleAddCollaborator = async () => {
         if (!selectedApp || !email) {
             showToast("Please select an app and enter an email address.", toastSeverity.ERROR);
@@ -288,28 +252,23 @@ const CollaboratorModal = ({ isModalVisible, setIsModalVisible, form, appsData }
         }
 
         setLoading(true);
-
-        try {
-            const queryParams = new URLSearchParams(location.search);
-            const accessKey = queryParams.get("accessKey");
-
-            await axios.post(`http://localhost:3000/apps/${selectedApp}/collaborators/${email}`, {}, {
-                headers: {
-                    "Authorization": `bearer ${accessKey}`
-                }
-            });
-
-            showToast(`Successfully added ${email} to ${selectedApp}`, toastSeverity.SUCCESS);
-            setIsModalVisible(false);
-            setEmail("");
-            form.resetFields();
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
-        } catch (error) {
-            setLoading(false);
-            showToast(error.response.data, toastSeverity.ERROR);
-        }
+        makeRequest({
+            method: "POST",
+            url: `/api/apps/${selectedApp}/collaborators/${email}`,
+            onSuccess: (response) => {
+                showToast(`Successfully added ${email} to ${selectedApp}`, toastSeverity.SUCCESS);
+                setIsModalVisible(false);
+                setEmail("");
+                form.resetFields();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            },
+            onError: (error) => {
+                setLoading(false);
+                showToast(error.response.data, toastSeverity.ERROR);
+            }
+        })
     };
 
     return (
@@ -421,11 +380,6 @@ const columns = [
             </div>
         )
     },
-    // {
-    //     title: "Role",
-    //     dataIndex: "role",
-    //     key: "role",
-    // },
     {
         title: "Collaborator",
         dataIndex: "collaborators",
